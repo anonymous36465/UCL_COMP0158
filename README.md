@@ -1,6 +1,6 @@
 # COMP0158 - A thesis submitted for the degree of MSc Data Science and Machine Learning
 
-_Note: The code was developed drawing on the configuration and data processing setup provided with P-NET (Haitham A Elmarakeby et al. in “Biologically informed deep neural network for prostate cancer discover" (paper link: https://www.nature.com/articles/s41586-021-03922-4)), which I adapted and extended for our own validation framework._
+_Note: The code was developed drawing on the configuration and data processing setup provided with P-NET (Haitham A Elmarakeby et al. in “Biologically informed deep neural network for prostate cancer discover" (paper link: https://www.nature.com/articles/s41586-021-03922-4)), which I adapted and extended for our own validation framework._ - Any external code used has been clearly indicated, and any modifications to it described.
 
 
 ## Installation
