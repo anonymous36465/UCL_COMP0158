@@ -40,10 +40,10 @@ conda install -c conda-forge cudatoolkit=11.0 cudnn=8.0
 ### Radiosensitivity Prediction/src/run_me_....py
 The 'run_me...' files contain the main CV experiments on ML models.
   
-### Modules Experiment
+### Radiosensitivity Prediction/Modules Experiment
 * The main.ipynb file walks through how to generate GSVA Module-based scores
 
-### Mean Methylation Experiments
+### Radiosensitivity Prediction/Mean Methylation Experiments
 Contains experiments related to the mean methylation experiments on both CCLE and mice data (mean_methylation_on_CCLE.ipynb, mean_methylation_on_PDX.ipynb).
 
 mean_methylation_analys.ipynb, data_differences_exploration.ipynb, preprocess_data.ipynb and mapping_raw_data.R do the necessary data preprocessing
@@ -53,7 +53,7 @@ special_genes_on_mie_data explores the TT53 and PTEN gene mutation relation to s
 ### MOSA Imputation
 The adapted code can be run from my colab notebook: https://drive.google.com/file/d/1nxggheuj4Rld-xn79Y41VqMd13K0QYkS/view?usp=sharing . The histone imputation run can be reproduced using these hyperparameters setup: https://drive.google.com/file/d/1yDzSIbekudaIY8d0zK17kI0CgbpRJ1S5/view?usp=sharing .
 
-### Model Evaluation on Mice Data
+### Radiosensitivity Prediction/Model Evaluation on Mice Data
 
 0. Download the experiment data and organize it in the folders:
 * imputed data:
