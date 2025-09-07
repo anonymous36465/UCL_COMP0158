@@ -32,11 +32,13 @@ conda install -c conda-forge cudatoolkit=11.0 cudnn=8.0
 8. samples_weights_utilis.py - The MAD-based and Perc-based sample weighting strategies
 
 
-### Radiosensitivity Prediction/src
+### Radiosensitivity Prediction/src - data download and preprocessing
 * data should be downloaded and preprocessed using these files:
    * download_data.py, download_R_datasets.R
    * preprocess.py, preprocess_histone.py
-* main CV experiments on ML models are in the 'run_me...' files
+
+### Radiosensitivity Prediction/src/run_me_....py
+The 'run_me...' files contain the main CV experiments on ML models.
   
 ### Modules Experiment
 * The main.ipynb file walks through how to generate GSVA Module-based scores
@@ -47,6 +49,9 @@ Contains experiments related to the mean methylation experiments on both CCLE an
 mean_methylation_analys.ipynb, data_differences_exploration.ipynb, preprocess_data.ipynb and mapping_raw_data.R do the necessary data preprocessing
 
 special_genes_on_mie_data explores the TT53 and PTEN gene mutation relation to survival in PDX models.
+
+### MOSA Imputation
+The adapted code can be run from my colab notebook: https://drive.google.com/file/d/1nxggheuj4Rld-xn79Y41VqMd13K0QYkS/view?usp=sharing . The histone imputation run can be reproduced using these hyperparameters setup: https://drive.google.com/file/d/1yDzSIbekudaIY8d0zK17kI0CgbpRJ1S5/view?usp=sharing .
 
 ### Model Evaluation on Mice Data
 
@@ -81,7 +86,4 @@ where data_type is either nothing, gsva_scores or mice_gsva_scores
 * specify: data_name, model_name, data_type
 * load the processed mice data from /data/
 * plot predictions and report other metrics
-
-### MOSA Imputation
-The adapted code can be run from this colab notebook: https://drive.google.com/file/d/1nxggheuj4Rld-xn79Y41VqMd13K0QYkS/view?usp=sharing . The histone imputation run can be reproduced using these hyperparameters setup: https://drive.google.com/file/d/1yDzSIbekudaIY8d0zK17kI0CgbpRJ1S5/view?usp=sharing .
 
