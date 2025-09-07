@@ -1,3 +1,4 @@
+# Code source: P-NET (Haitham A Elmarakeby et al. in “Biologically informed deep neural network for prostate cancer discover" (paper link: https://www.nature.com/articles/s41586-021-03922-4)), 
 
 import re, os
 import networkx as nx

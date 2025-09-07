@@ -130,13 +130,13 @@ class MLP_mid_fusion_scheduled:
         num_epochs=10,
         dropout_prob=0.0,
         identity_head_indices=None,
-        active_head_indices=None,      # NEW: which modalities to use in this run
-        weight_decay=0.0,              # NEW: scikit-like alpha
-        scheduler="plateau",           # NEW: None or "plateau"
+        active_head_indices=None,      
+        weight_decay=0.0,              
+        scheduler="plateau",          
         sched_factor=0.5,
         sched_patience=2,
         sched_min_lr=1e-6,
-        early_stopping_patience=None,  # e.g. 5; None disables
+        early_stopping_patience=None,
         seed=42,
     ):
         self.datasets = datasets

@@ -1,3 +1,6 @@
+# Code source: P-NET (Haitham A Elmarakeby et al. in “Biologically informed deep neural network for prostate cancer discover" (paper link: https://www.nature.com/articles/s41586-021-03922-4)), 
+
+
 import numpy as np
 from keras import backend as K
 import tensorflow as tf
@@ -16,7 +19,6 @@ from architecture.deepexplain.tensorflow_ import DeepExplain
 import architecture.evaluation as mm
 
 tf.compat.v1.disable_eager_execution()
-
 
 def predict(model, X, loss=None):
     prediction_scores = model.predict(X)

@@ -1,3 +1,6 @@
+# Code source: P-NET (Haitham A Elmarakeby et al. in “Biologically informed deep neural network for prostate cancer discover" (paper link: https://www.nature.com/articles/s41586-021-03922-4)), 
+# Added functionality: evaluate_predictions_like_regression, evaluate_predictions_rank_based
+
 import os, sys
 import joblib
 import pandas as pd
@@ -459,3 +462,83 @@ def evaluate_predictions_like_regression(tag, run_dir, data_dir,
         print("[summary] No folds processed.")
         return pd.DataFrame(columns=["metric", "mean", "std"])
 
+# define the epsilon-threshold SVM-like loss
+def svm_like_eval(y_true, y_pred, epsilon=1.0):
+    abs_diff = np.array([np.max([np.abs(y_true[i] - y_pred[i])-epsilon, 0]) for i in range(len(y_true))])
+    return abs_diff.mean()
+
+
+def evaluate_predictions_rank_based(tag, run_dir, data_dir,
+                                         label_csv_path='cleveland_auc_full.csv',
+                                         label_name='auc',
+                                         pred_name='auc_pred',
+                                         n_folds=5,
+                                         epsilon=1.0): 
+    """
+    Extended evaluation:
+      - Spermans rho
+      - AUROC (divide by median)
+      - epsilon-relaxed SVM-like metric
+    """
+    results_path = os.path.join(run_dir, tag)
+
+    labels_df = pd.read_csv(f"{data_dir}/{label_csv_path}", index_col=0)
+    label_series = labels_df[label_name] if label_name in labels_df.columns else labels_df.squeeze("columns")
+
+    rhos, aurocs, epsilons_2, epsilons_15, epsilons_1, epsilons_05 = [], [], [], [], [], []
+
+    for test_id in range(n_folds):
+        test_file = os.path.join(results_path, f'test_{test_id}', 'best', 'test_results.csv')
+        if not os.path.exists(test_file):
+            print(f"[warn] Missing: {test_file}")
+            continue
+
+        df = pd.read_csv(test_file, index_col=0)
+
+        # Align ground truth
+        y_true = label_series.reindex(df.index)
+        if y_true.isna().any():
+            missing = int(y_true.isna().sum())
+            print(f"[warn] {missing} IDs missing in label CSV for fold {test_id}. Dropping them.")
+            mask = ~y_true.isna()
+            df = df.loc[mask]
+            y_true = y_true.loc[mask]
+
+        df['class'] = df['auc']
+        df['class_pred'] = df['auc_pred']
+        df[label_name] = y_true.values
+
+        # Metrics (numeric)
+        y_t = df[label_name].values
+        y_p = df[pred_name].values
+
+        spearman_rho = pd.Series(y_t).corr(pd.Series(y_p), method="spearman")
+        rhos.append(spearman_rho)
+
+        median_thr = np.median(y_t)
+        y_bin = (y_t >= median_thr).astype(int)
+        if y_bin.min() != y_bin.max():
+            auc_sep = roc_auc_score(y_bin, y_p)
+        else:
+            print("AUROC: n/a (1 class)")
+        aurocs.append(auc_sep)
+
+        svm_eps_2 = svm_like_eval(y_t, y_p, epsilon=2.0)
+        svm_eps_15 = svm_like_eval(y_t, y_p, epsilon=1.5)
+        svm_eps_1 = svm_like_eval(y_t, y_p, epsilon=1.0)
+        svm_eps_05 = svm_like_eval(y_t, y_p, epsilon=0.5)
+        epsilons_2.append(svm_eps_2)
+        epsilons_15.append(svm_eps_15)
+        epsilons_1.append(svm_eps_1)
+        epsilons_05.append(svm_eps_05)
+
+        print(f"[fold {test_id}] Rho={spearman_rho:.6f} | AUROC={auc_sep:.6f} | SVM_1={svm_eps_1:.6f} | SVM_0.5={svm_eps_05:.6f}")
+
+    # Summary CSV
+    if aurocs:
+        print(f"Spermans rho: { float(np.nanmean(rhos))} +- {float(np.nanstd(rhos, ddof=0))}")
+        print(f"AUROC: { float(np.nanmean(aurocs))} +- {float(np.nanstd(aurocs, ddof=0))}")
+        print(f"SVM 2.0: { float(np.nanmean(epsilons_2))} +- {float(np.nanstd(epsilons_2, ddof=0))}")
+        print(f"SVM 1.5: { float(np.nanmean(epsilons_15))} +- {float(np.nanstd(epsilons_15, ddof=0))}")
+        print(f"SVM 1.0: { float(np.nanmean(epsilons_1))} +- {float(np.nanstd(epsilons_1, ddof=0))}")
+        print(f"SVM 0.5: { float(np.nanmean(epsilons_05))} +- {float(np.nanstd(epsilons_05, ddof=0))}")
