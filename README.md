@@ -82,3 +82,6 @@ where data_type is either nothing, gsva_scores or mice_gsva_scores
 * load the processed mice data from /data/
 * plot predictions and report other metrics
 
+### MOSA Imputation
+The adapted code can be run from this colab notebook: https://drive.google.com/file/d/1nxggheuj4Rld-xn79Y41VqMd13K0QYkS/view?usp=sharing . The histone imputation run can be reproduced using these hyperparameters setup: https://drive.google.com/file/d/1yDzSIbekudaIY8d0zK17kI0CgbpRJ1S5/view?usp=sharing .
+
