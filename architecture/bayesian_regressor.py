@@ -5,26 +5,25 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 
+# Simple bayesian regressor model
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# ---------- Losses that account for label noise ----------
+# Negative Log Likelihood loss
 @torch.jit.script
 def fixed_var_nll(y_pred: torch.Tensor, y_true: torch.Tensor, sem: torch.Tensor):
     """
-    Negative log-likelihood with *known* label noise (SEM).
-    sem can be scalar, shape [B], or [B, 1].
+    Negative log-likelihood with known label noise (SEM).
     """
     var = sem**2
-    # Ensure broadcast to match shape of y_pred/y_true
     if var.dim() == 1:
         var = var.unsqueeze(-1)
-    # ( (y - yhat)^2 / (2*var) + 0.5*log(2*pi*var) )
     return (((y_true - y_pred) ** 2) / (2.0 * var) + 0.5 * torch.log(2.0 * math.pi * var)).mean()
 
 @torch.jit.script
 def nll_with_pred_var(y_mean: torch.Tensor, y_log_var: torch.Tensor, y_true: torch.Tensor, label_sem: torch.Tensor):
     """
-    Heteroscedastic NLL where network also predicts data noise.
+    NLL where network also predicts data noise.
     Total variance = exp(log_var_pred) + label_sem^2  (variances add).
     label_sem can be 0 (scalar) if unknown.
     """
@@ -35,7 +34,6 @@ def nll_with_pred_var(y_mean: torch.Tensor, y_log_var: torch.Tensor, y_true: tor
     total_var = pred_var + lab_var
     return (((y_true - y_mean) ** 2) / (2.0 * total_var) + 0.5 * torch.log(2.0 * math.pi * total_var)).mean()
 
-# ---------- Simple MLP with MC Dropout ("Bayesian-ish") ----------
 class SimpleBayesianMLP(nn.Module):
     def __init__(self, input_dim: int, hidden_dims=(128, 128), dropout_prob=0.1, predict_variance=True):
         """
@@ -74,7 +72,7 @@ class BayesianRegressor:
         weight_decay=0.0,
         mc_samples=20,
         seed: int = 42,
-        default_y_sem=None,   # <--- NEW
+        default_y_sem=None,
     ):
         self.model = SimpleBayesianMLP(
             input_dim=input_dim,
@@ -148,8 +146,7 @@ class BayesianRegressor:
     def predict(self, X, mc_samples=None, return_std=False):
         """
         mc_samples: if None, uses self.mc_samples.
-        Returns mean predictions; if return_std, returns (mean, std) where std includes
-        epistemic (MC Dropout) and aleatoric (if predicted) uncertainty.
+        Returns mean predictions; if return_std, returns (mean, std)
         """
         mc = self.mc_samples if mc_samples is None else mc_samples
         X_t = torch.as_tensor(X, dtype=torch.float32).to(device)
